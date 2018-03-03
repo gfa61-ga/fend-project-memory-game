@@ -65,3 +65,85 @@ displayNewGameCards();
  *    + if all cards have matched, display a message with the final score (put this functionality in another function that you call from this one)
  */
 
+let matchedCards, moveCounter, openCards;
+
+function setupNewGame() {
+    matchedCards = 0;
+    moveCounter = 0;
+    openCards = [];
+}
+
+function displayCard(clickedCard) {
+    clickedCard.classList.add('open', 'show');
+};
+
+function addToOpenCards(clickedCard) {
+    openCards.push(clickedCard);
+};
+
+function updateMoveCounter() {
+    moveCounter++;
+    /* TODO */
+};
+
+function updateStars() {
+    /* TODO */
+};
+
+function addToMachedCards() {
+    for (const card of openCards) {
+        card.classList.remove('open', 'show');
+        card.classList.add('match');
+    }
+    // empty openCards
+    openCards = [];
+    matchedCards += 2;
+};
+
+function displayFinalScore() {
+    console.log('Congratulations! You won! with ' + moveCounter + ' moves');
+    /* TODO */
+};
+
+function hideOpenCards() {
+    for (const card of openCards) {
+        card.classList.remove('open', 'show');
+    }
+    // empty openCards
+    openCards = [];
+};
+
+setupNewGame();
+
+deck.addEventListener('click', function(e) {
+    // if target is a card
+    if (e.target.classList.contains('card')) {
+        let clickedCard = e.target;
+        // if the clicked card is not already matched
+        if (clickedCard.classList.contains('match') === false) {
+            // if the clicked card is not already open (not clicked twice)
+            if (openCards.includes(clickedCard) === false) {
+                displayCard(clickedCard);
+                addToOpenCards(clickedCard);
+                // if there is another open card then we have a move to check
+                if (openCards.length > 1) {
+                    updateMoveCounter();
+                    updateStars();
+                    firstCard = openCards[0];
+                    firstCardSymbol = firstCard.children[0].className;
+                    secondCard = openCards[1];
+                    secondCardSymbol = secondCard.children[0].className;
+                    // check the equality of symbols classes
+                    if (firstCardSymbol === secondCardSymbol) {
+                        addToMachedCards();
+                        if (matchedCards === 2) {
+                            displayFinalScore();
+                        }
+                    } else {
+                        hideOpenCards();
+                    }
+                }
+            }
+        }
+    }
+});
