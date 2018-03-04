@@ -1,5 +1,5 @@
 /*
- * Create a list that holds all of your cards
+ * Create a list that holds all game cards
  */
 
 let cards = ['diamond', 'diamond',
@@ -12,14 +12,24 @@ let cards = ['diamond', 'diamond',
     'bomb', 'bomb'
 ];
 
+// Declare global variables
+let matchedCards, moveCounter, starCounter, openCards;
+
+// Set element selectors
+const stars = document.querySelectorAll('.stars li i');
+const secondStar = stars[1];
+const thirdStar = stars[2];
+
+const movesPanel = document.querySelector('.moves');
+const restartButton = document.querySelector('.restart');
+const deck = document.querySelector(".deck");
+
 /*
  * Display the cards on the page
  *   - shuffle the list of cards using the provided "shuffle" method below
  *   - loop through each card and create its HTML
  *   - add each card's HTML to the page
  */
-
-const deck = document.querySelector(".deck");
 
 function displayNewGameCards() {
     shuffle(cards);
@@ -48,32 +58,9 @@ function shuffle(array) {
         array[currentIndex] = array[randomIndex];
         array[randomIndex] = temporaryValue;
     }
-
-    return array;
 }
 
-displayNewGameCards();
-
-/*
- * set up the event listener for a card. If a card is clicked:
- *  - display the card's symbol (put this functionality in another function that you call from this one)
- *  - add the card to a *list* of "open" cards (put this functionality in another function that you call from this one)
- *  - if the list already has another card, check to see if the two cards match
- *    + if the cards do match, lock the cards in the open position (put this functionality in another function that you call from this one)
- *    + if the cards do not match, remove the cards from the list and hide the card's symbol (put this functionality in another function that you call from this one)
- *    + increment the move counter and display it on the page (put this functionality in another function that you call from this one)
- *    + if all cards have matched, display a message with the final score (put this functionality in another function that you call from this one)
- */
-
-let matchedCards, moveCounter, starCounter, openCards;
-
-const stars = document.querySelectorAll('.stars li i');
-const secondStar = stars[1];
-const thirdStar = stars[2];
-
-const movesPanel = document.querySelector('.moves');
-const restartButton = document.querySelector('.restart');
-
+// Reset counters, score panel etc
 function setupNewGame() {
     matchedCards = 0;
     moveCounter = 0;
@@ -86,14 +73,17 @@ function setupNewGame() {
     movesPanel.innerText = 0;
 }
 
+// Display the card's symbol
 function displayCard(clickedCard) {
     clickedCard.classList.add('open', 'show');
 };
 
+// Add the card to a *list* of "open" cards
 function addToOpenCards(clickedCard) {
     openCards.push(clickedCard);
 };
 
+// Increment the move counter and display it on the page
 function updateMoveCounter() {
     movesPanel.innerText = ++moveCounter;
 };
@@ -109,50 +99,72 @@ function updateStars() {
     }
 };
 
+// Lock the cards in the open position
 function addToMachedCards() {
     for (const card of openCards) {
         card.classList.remove('open', 'show');
         card.classList.add('match');
     }
-    // empty openCards
+    // Empty openCards
     openCards = [];
+
     matchedCards += 2;
 };
 
+// Display a message with the final score
 function displayFinalScore() {
     console.log('Congratulations! You won! with ' + moveCounter + ' moves');
     /* TODO */
 };
 
+// Remove the cards from the list and hide the card's symbol
 function hideOpenCards() {
     for (const card of openCards) {
         card.classList.remove('open', 'show');
     }
-    // empty openCards
+    // Empty openCards
     openCards = [];
 };
 
+/*
+ * Actions when the game is first loaded
+ */
+
+displayNewGameCards();
 setupNewGame();
 
-deck.addEventListener('click', function(e) {
-    // if target is a card
+/*
+ * set up the event listener for the cards. If a card is clicked:
+ *  - display the card's symbol
+ *  - add the card to a *list* of "open" cards
+ *  - if the list already has another card, check to see if the two cards match
+ *    + if the cards do match, lock the cards in the open position
+ *    + if the cards do not match, remove the cards from the list and hide the card's symbol
+ *    + increment the move counter and display it on the page
+ *    + if all cards have matched, display a message with the final score
+ */
+
+ deck.addEventListener('click', function(e) {
+    // If target is a card
     if (e.target.classList.contains('card')) {
         let clickedCard = e.target;
-        // if the clicked card is not already matched
+        // If the clicked card is not already matched
         if (clickedCard.classList.contains('match') === false) {
-            // if the clicked card is not already open (not clicked twice)
+            // If the clicked card is not already open (is not clicked twice)
             if (openCards.includes(clickedCard) === false) {
                 displayCard(clickedCard);
                 addToOpenCards(clickedCard);
-                // if there is another open card then we have a move to check
+                // And if there is another open card, then we have a move to handle
                 if (openCards.length > 1) {
                     updateMoveCounter();
                     updateStars();
+
                     firstCard = openCards[0];
                     firstCardSymbol = firstCard.children[0].className;
                     secondCard = openCards[1];
                     secondCardSymbol = secondCard.children[0].className;
-                    // check the equality of symbols classes
+
+                    // Check the equality of symbols classes
                     if (firstCardSymbol === secondCardSymbol) {
                         addToMachedCards();
                         if (matchedCards === 16) {
