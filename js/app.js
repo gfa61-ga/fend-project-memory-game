@@ -65,12 +65,25 @@ displayNewGameCards();
  *    + if all cards have matched, display a message with the final score (put this functionality in another function that you call from this one)
  */
 
-let matchedCards, moveCounter, openCards;
+let matchedCards, moveCounter, starCounter, openCards;
+
+const stars = document.querySelectorAll('.stars li i');
+const secondStar = stars[1];
+const thirdStar = stars[2];
+
+const movesPanel = document.querySelector('.moves');
+const restartButton = document.querySelector('.restart');
 
 function setupNewGame() {
     matchedCards = 0;
     moveCounter = 0;
     openCards = [];
+
+    starCounter = 3;
+    secondStar.classList.replace('fa-star-o', 'fa-star');
+    thirdStar.classList.replace('fa-star-o', 'fa-star');
+
+    movesPanel.innerText = 0;
 }
 
 function displayCard(clickedCard) {
@@ -82,12 +95,18 @@ function addToOpenCards(clickedCard) {
 };
 
 function updateMoveCounter() {
-    moveCounter++;
-    /* TODO */
+    movesPanel.innerText = ++moveCounter;
 };
 
 function updateStars() {
-    /* TODO */
+    if (moveCounter === 9) {
+        thirdStar.classList.replace('fa-star', 'fa-star-o');
+        starCounter = 2;
+    }
+    if (moveCounter === 15) {
+        secondStar.classList.replace('fa-star', 'fa-star-o');
+        starCounter = 1;
+    }
 };
 
 function addToMachedCards() {
@@ -136,7 +155,7 @@ deck.addEventListener('click', function(e) {
                     // check the equality of symbols classes
                     if (firstCardSymbol === secondCardSymbol) {
                         addToMachedCards();
-                        if (matchedCards === 2) {
+                        if (matchedCards === 16) {
                             displayFinalScore();
                         }
                     } else {
@@ -146,4 +165,9 @@ deck.addEventListener('click', function(e) {
             }
         }
     }
+});
+
+restartButton.addEventListener('click', function(e) {
+    displayNewGameCards();
+    setupNewGame();
 });
