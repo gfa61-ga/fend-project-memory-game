@@ -17,7 +17,8 @@ body {
 }
 
 body {
-    background: #ffffff url('../img/geometry2.png'); /* Background pattern from Subtle Patterns */
+    /* Background pattern from Subtle Patterns */
+    background: #ffffff url('../img/geometry2.png');
     font-family: 'Coda', cursive;
 }
 
@@ -48,7 +49,7 @@ h1 {
     flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
-    margin: 0 0 3em;
+    margin: 0 0 10px;
 }
 
 .deck .card {
@@ -87,8 +88,9 @@ h1 {
 
 .score-panel {
     text-align: left;
-    width: 345px;
+    width: 375px;
     margin-bottom: 10px;
+    padding-left: 15px;
 }
 
 .score-panel .stars {
@@ -105,5 +107,37 @@ h1 {
 
 .score-panel .restart {
     float: right;
+    cursor: pointer;
+    padding: 0 17px 0;
+}
+
+/*
+ * Styles for the Bottom Panel
+ */
+
+.bottom-panel {
+    width: 380px;
+    display: inline-flex;
+    justify-content: space-between;
+    padding-left: 25px;
+    margin-top: 10px;
+}
+
+.timer .time-string {
+    padding-left: 5px;
+}
+
+.message-area {
+    display: none;
+}
+
+.message-area .message {
+    padding-left: 5px;
+}
+
+.bottom-panel .storage-buttons .save,
+.load {
+    display: inline-block;
+    padding: 0 17px 0;
     cursor: pointer;
 }
