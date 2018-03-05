@@ -14,6 +14,7 @@ let cards = ['diamond', 'diamond',
 
 // Declare global variables
 let matchedCards, moveCounter, starCounter, openCards;
+let gameStartTimeMsec, gameTimer;
 
 // Set element selectors
 const stars = document.querySelectorAll('.stars li i');
@@ -23,6 +24,7 @@ const thirdStar = stars[2];
 const movesPanel = document.querySelector('.moves');
 const restartButton = document.querySelector('.restart');
 const deck = document.querySelector(".deck");
+const timerArea = document.querySelector(".time-string");
 
 /*
  * Display the cards on the page
@@ -60,7 +62,7 @@ function shuffle(array) {
     }
 }
 
-// Reset counters, score panel etc
+// Reset counters, score panel, timer etc
 function setupNewGame() {
     matchedCards = 0;
     moveCounter = 0;
@@ -71,22 +73,25 @@ function setupNewGame() {
     thirdStar.classList.replace('fa-star-o', 'fa-star');
 
     movesPanel.innerText = 0;
+
+    gameStartTimeMsec = Date.now();
+    gameTimer = setInterval(updateTimer, 200);
 }
 
 // Display the card's symbol
 function displayCard(clickedCard) {
     clickedCard.classList.add('open', 'show');
-};
+}
 
 // Add the card to a *list* of "open" cards
 function addToOpenCards(clickedCard) {
     openCards.push(clickedCard);
-};
+}
 
 // Increment the move counter and display it on the page
 function updateMoveCounter() {
     movesPanel.innerText = ++moveCounter;
-};
+}
 
 function updateStars() {
     if (moveCounter === 9) {
@@ -97,7 +102,7 @@ function updateStars() {
         secondStar.classList.replace('fa-star', 'fa-star-o');
         starCounter = 1;
     }
-};
+}
 
 // Lock the cards in the open position
 function addToMachedCards() {
@@ -109,13 +114,16 @@ function addToMachedCards() {
     openCards = [];
 
     matchedCards += 2;
-};
+}
 
 // Display a message with the final score
 function displayFinalScore() {
+    // Stop the timer
+    clearInterval(gameTimer);
+
     console.log('Congratulations! You won! with ' + moveCounter + ' moves');
     /* TODO */
-};
+}
 
 // Remove the cards from the list and hide the card's symbol
 function hideOpenCards() {
@@ -124,7 +132,31 @@ function hideOpenCards() {
     }
     // Empty openCards
     openCards = [];
-};
+}
+
+// Update game's timer
+function updateTimer() {
+    const msecNow = Date.now();
+    const msecElapsed = msecNow - gameStartTimeMsec;
+
+    const timeElapsed = msecToTimeString(msecElapsed);
+    timerArea.innerText = timeElapsed;
+}
+
+// Convert milliseconds to timeString
+function msecToTimeString(timeInMsecs) {
+    const timeConverter = new Date();
+    timeConverter.setTime(timeInMsecs);
+
+    // use 24-hour time, in order to start time count from 00:00:00
+    const options = {
+        timeZone: 'UTC',
+        hour12: false
+    };
+
+    const timeString = timeConverter.toLocaleTimeString('en-US', options);
+    return timeString;
+}
 
 /*
  * Actions when the game is first loaded
