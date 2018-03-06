@@ -14,7 +14,7 @@ let cards = ['diamond', 'diamond',
 
 // Declare global variables
 let matchedCards, moveCounter, starCounter, openCards;
-let gameStartTimeMsec, gameTimer;
+let gameStartTimeMsec, gameTimer, msecElapsed;
 
 // Set element selectors
 const stars = document.querySelectorAll('.stars li i');
@@ -23,8 +23,18 @@ const thirdStar = stars[2];
 
 const movesPanel = document.querySelector('.moves');
 const restartButton = document.querySelector('.restart');
-const deck = document.querySelector(".deck");
-const timerArea = document.querySelector(".time-string");
+const deck = document.querySelector('.deck');
+const timerArea = document.querySelector('.time-string');
+const gamePanel = document.querySelector('.game-panel');
+const winPanel = document.querySelector('.win-panel');
+const gameTimeSpan = document.querySelector('.game-time');
+const gameStarsSpan = document.querySelector('.star-number');
+const playAgainButton = document.querySelector('.play-again');
+
+
+/*
+ * Declare game functions
+ */
 
 /*
  * Display the cards on the page
@@ -32,7 +42,6 @@ const timerArea = document.querySelector(".time-string");
  *   - loop through each card and create its HTML
  *   - add each card's HTML to the page
  */
-
 function displayNewGameCards() {
     shuffle(cards);
 
@@ -121,8 +130,11 @@ function displayFinalScore() {
     // Stop the timer
     clearInterval(gameTimer);
 
-    console.log('Congratulations! You won! with ' + moveCounter + ' moves');
-    /* TODO */
+    gamePanel.style.display = 'none';
+    winPanel.style.display = 'flex';
+
+    gameTimeSpan.innerText =  msecToTimeString(msecElapsed);
+    gameStarsSpan.innerText = starCounter;
 }
 
 // Remove the cards from the list and hide the card's symbol
@@ -137,7 +149,7 @@ function hideOpenCards() {
 // Update game's timer
 function updateTimer() {
     const msecNow = Date.now();
-    const msecElapsed = msecNow - gameStartTimeMsec;
+    msecElapsed = msecNow - gameStartTimeMsec;
 
     const timeElapsed = msecToTimeString(msecElapsed);
     timerArea.innerText = timeElapsed;
@@ -151,6 +163,8 @@ function msecToTimeString(timeInMsecs) {
     // use 24-hour time, in order to start time count from 00:00:00
     const options = {
         timeZone: 'UTC',
+        minute: '2-digit',
+        second:'2-digit',
         hour12: false
     };
 
@@ -158,15 +172,19 @@ function msecToTimeString(timeInMsecs) {
     return timeString;
 }
 
+function startNewGame() {
+    displayNewGameCards();
+    setupNewGame();
+}
+
 /*
- * Actions when the game is first loaded
+ * Start game
  */
 
-displayNewGameCards();
-setupNewGame();
+startNewGame();
 
 /*
- * set up the event listener for the cards. If a card is clicked:
+ * Add the event listener for the cards. If a card is clicked:
  *  - display the card's symbol
  *  - add the card to a *list* of "open" cards
  *  - if the list already has another card, check to see if the two cards match
@@ -175,7 +193,6 @@ setupNewGame();
  *    + increment the move counter and display it on the page
  *    + if all cards have matched, display a message with the final score
  */
-
  deck.addEventListener('click', function(e) {
     // If target is a card
     if (e.target.classList.contains('card')) {
@@ -211,7 +228,15 @@ setupNewGame();
     }
 });
 
+// Add the event listener for restart button
 restartButton.addEventListener('click', function(e) {
-    displayNewGameCards();
-    setupNewGame();
+    startNewGame();
+});
+
+// Add the event listener for play-again button
+playAgainButton.addEventListener('click', function(e) {
+    startNewGame();
+
+    gamePanel.style.display = 'flex';
+    winPanel.style.display = 'none';
 });

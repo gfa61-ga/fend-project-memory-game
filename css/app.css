@@ -88,6 +88,7 @@ h1 {
 
 .score-panel {
     text-align: left;
+    font-size: 18px;
     width: 375px;
     margin-bottom: 10px;
     padding-left: 15px;
@@ -117,12 +118,16 @@ h1 {
 
 .bottom-panel {
     width: 380px;
+    font-size: 18px;
     display: inline-flex;
     justify-content: space-between;
     padding-left: 25px;
     margin-top: 10px;
 }
 
+.timer {
+    padding-bottom: 35px;
+}
 .timer .time-string {
     padding-left: 5px;
 }
@@ -140,4 +145,61 @@ h1 {
     display: inline-block;
     padding: 0 17px 0;
     cursor: pointer;
+    /* TODO */
+    display: none;
 }
+
+/*
+ * Styles for the win-panel
+ */
+
+.win-panel {
+    display: none;
+}
+
+.success-icon {
+    margin: 65px 0 0;
+}
+
+.success-icon .fa {
+    font-size: 38px;
+    color: #b4de9d;
+    border: 2px solid #eee;
+    border-radius:35px;
+    padding: 13px;
+}
+
+.win-panel h1 {
+    font-weight: 700;
+    margin: 28px 0 10px;
+}
+
+.score-message p {
+    margin: 0;
+    font-size: 18px;
+}
+
+.win-message {
+    text-align: center;
+}
+
+.win-panel .play-again {
+    width:130px;
+    height:32px;
+    font-weight: 700;
+    font-size: 16px;
+    color: white;
+    background-color: #01b9a7;
+    border: 1px solid #6dcfc6;
+    border-radius: 5px;
+    padding: 0;
+    margin: 12px 0;
+    cursor: pointer;
+}
+
+.leaderboard {
+    display: none;
+    /* TODO */
+}
+
+

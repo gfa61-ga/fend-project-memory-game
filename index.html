@@ -4,13 +4,14 @@
     <meta charset="utf-8">
     <title>Matching Game</title>
     <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet prefetch" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
     <link rel="stylesheet prefetch" href="https://fonts.googleapis.com/css?family=Coda">
     <link rel="stylesheet" href="css/app.css">
 </head>
 <body>
 
-    <div class="container">
+    <div class="container game-panel">
         <header>
             <h1>Matching Game</h1>
         </header>
@@ -100,6 +101,56 @@
                     <i class="fa fa-folder-open"></i>
                 </div>
             </div>
+        </section>
+    </div>
+
+    <div class="container win-panel">
+        <section class="win-message">
+            <div class="success-icon">
+                <i class="fa fa-check fa-sm"></i>
+            </div>
+
+            <header>
+                <h1>Congratulations! You Won!</h1>
+            </header>
+
+            <div class="score-message">
+                <p>
+                    In <span class="game-time">02:05</span>,
+                    with <span class="star-number">3</span> Stars.
+                </p>
+                <p>
+                    Wooooo.!
+                </p>
+            </div>
+        </section>
+
+        <button class="play-again">
+            Play again?
+        </button>
+
+        <section class="leaderboard">
+            <header>
+                <h3>Top 5 games:</h3>
+            </header>
+
+            <table class="top-5-games">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Game time</th>
+                        <th>Stars</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr>
+                        <td class="td-date">21-03-2018 08:45</td>
+                        <td class="td-game-time">02:13</td>
+                        <td class="td-stars">03</td>
+                    </tr>
+                </tbody>
+            </table>
         </section>
     </div>
 
