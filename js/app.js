@@ -33,7 +33,7 @@ const playAgainButton = document.querySelector('.play-again');
 
 
 /*
- * Declare game functions
+ * Implement game functions
  */
 
 /*
@@ -134,7 +134,7 @@ function displayFinalScore() {
     winPanel.style.display = 'flex';
 
     gameTimeSpan.innerText =  msecToTimeString(msecElapsed);
-    gameStarsSpan.innerText = starCounter;
+    gameStarsSpan.innerText = starCounter === 1 ? starCounter + ' Star.' : starCounter + ' Stars.';
 }
 
 // Remove the cards from the list and hide the card's symbol
