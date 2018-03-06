@@ -31,7 +31,6 @@ const gameTimeSpan = document.querySelector('.game-time');
 const gameStarsSpan = document.querySelector('.star-number');
 const playAgainButton = document.querySelector('.play-again');
 
-
 /*
  * Implement game functions
  */
@@ -95,6 +94,17 @@ function displayCard(clickedCard) {
 // Add the card to a *list* of "open" cards
 function addToOpenCards(clickedCard) {
     openCards.push(clickedCard);
+
+    if (openCards.length === 1) {
+        clickedCard.style.backgroundColor = '#02b3e4';
+
+        // Add pulse animation to the first card
+        clickedCard.classList.add('animated', 'pulse');
+
+        setTimeout(function() {
+            clickedCard.classList.remove('pulse');
+        }, 300);
+    }
 }
 
 // Increment the move counter and display it on the page
@@ -116,9 +126,17 @@ function updateStars() {
 // Lock the cards in the open position
 function addToMachedCards() {
     for (const card of openCards) {
+        card.style.backgroundColor = '#02ccba';
         card.classList.remove('open', 'show');
-        card.classList.add('match');
+
+        // Add rubberBand animation to the matched cards
+        card.classList.add('match', 'animated', 'rubberBand');
+
+        setTimeout(function() {
+            card.classList.remove('rubberBand');
+        }, 500);
     }
+
     // Empty openCards
     openCards = [];
 
@@ -130,6 +148,7 @@ function displayFinalScore() {
     // Stop the timer
     clearInterval(gameTimer);
 
+    // Display win panel
     gamePanel.style.display = 'none';
     winPanel.style.display = 'flex';
 
@@ -140,8 +159,17 @@ function displayFinalScore() {
 // Remove the cards from the list and hide the card's symbol
 function hideOpenCards() {
     for (const card of openCards) {
-        card.classList.remove('open', 'show');
+        card.style.backgroundColor = '#f95b3c';
+
+        // Add wobble animation to the selected cards
+        card.classList.add('animated', 'wobble');
+
+        setTimeout(function() {
+            card.classList.remove('wobble', 'open', 'show');
+            card.style.backgroundColor = '#2e3d49';
+        }, 500);
     }
+
     // Empty openCards
     openCards = [];
 }
@@ -217,7 +245,9 @@ startNewGame();
                     if (firstCardSymbol === secondCardSymbol) {
                         addToMachedCards();
                         if (matchedCards === 16) {
-                            displayFinalScore();
+                            setTimeout(function() {
+                                displayFinalScore();
+                            }, 2000);
                         }
                     } else {
                         hideOpenCards();
@@ -237,6 +267,7 @@ restartButton.addEventListener('click', function(e) {
 playAgainButton.addEventListener('click', function(e) {
     startNewGame();
 
+    // Display game panel
     gamePanel.style.display = 'flex';
     winPanel.style.display = 'none';
 });
