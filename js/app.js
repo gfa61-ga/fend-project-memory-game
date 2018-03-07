@@ -86,6 +86,16 @@ function setupNewGame() {
     // Start the timer
     gameStartTimeMsec = Date.now();
     gameTimer = setInterval(updateTimer, 200);
+
+    // If localStorage is available display save button
+    if (storageAvailable('localStorage')) {
+        saveButton.style.display = 'inline-block';
+    }
+
+    // If there is game-data in localStorage display load button
+    if (localStorage.getItem('moveCounter') != null) {
+        loadButton.style.display = 'inline-block';
+    }
 }
 
 // Display the card's symbol
@@ -118,13 +128,13 @@ function updateMoveCounter() {
 // Hide stars according to moveCounter value
 function updateStars() {
     // Hide 3rd star after 8th move
-    if (moveCounter === 9) {
+    if (moveCounter >= 9) {
         thirdStar.classList.replace('fa-star', 'fa-star-o');
         starCounter = 2;
     }
 
     // Hide 2nd star after 14th move
-    if (moveCounter === 15) {
+    if (moveCounter >= 15) {
         secondStar.classList.replace('fa-star', 'fa-star-o');
         starCounter = 1;
     }
@@ -238,7 +248,16 @@ function restoreCardClasses() {
     }
 }
 
-// Save the current game
+// Return true if localStorage is both supported and available
+function storageAvailable(type) {
+    var storage = window[type],
+        x = '__storage_test__';
+    storage.setItem(x, x);
+    storage.removeItem(x);
+    return true;
+}
+
+// Save the current game in localStorage
 function saveGame() {
     // Save game-status variable-values
     localStorage.setItem('moveCounter', moveCounter);
@@ -266,7 +285,7 @@ function saveGame() {
     loadButton.style.display = 'inline-block';
 }
 
-// Load the saved game
+// Load the saved game from localStorage
 function loadGame() {
     // Restore game-status variable-values
     moveCounter = parseInt(localStorage.getItem('moveCounter'));
@@ -369,7 +388,9 @@ playAgainButton.addEventListener('click', function(e) {
     winPanel.style.display = 'none';
 
     // Display load button
-    loadButton.style.display = 'inline-block';
+    if (storageAvailable('localStorage')) {
+        loadButton.style.display = 'inline-block';
+    }
 });
 
 // Add the event listener for save-game button
