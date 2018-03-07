@@ -1,5 +1,5 @@
 /*
- * Create a list that holds all game cards
+ * Create a list that holds the 16 card-symbols
  */
 
 let cards = ['diamond', 'diamond',
@@ -14,18 +14,25 @@ let cards = ['diamond', 'diamond',
 
 // Declare global variables
 let matchedCards, moveCounter, starCounter, openCards;
-let gameStartTimeMsec, gameTimer, msecElapsed;
+let gameStartTimeMsec, gameTimer, msecOfGameTime, cardClasses;
 
 // Set element selectors
+const gamePanel = document.querySelector('.game-panel');
+const deck = document.querySelector('.deck');
+
 const stars = document.querySelectorAll('.stars li i');
 const secondStar = stars[1];
 const thirdStar = stars[2];
 
 const movesPanel = document.querySelector('.moves');
 const restartButton = document.querySelector('.restart');
-const deck = document.querySelector('.deck');
+
 const timerArea = document.querySelector('.time-string');
-const gamePanel = document.querySelector('.game-panel');
+const messageArea = document.querySelector('.message-area');
+const message = document.querySelector('.message');
+const saveButton = document.querySelector('.save');
+const loadButton = document.querySelector('.load');
+
 const winPanel = document.querySelector('.win-panel');
 const gameTimeSpan = document.querySelector('.game-time');
 const gameStarsSpan = document.querySelector('.star-number');
@@ -35,15 +42,8 @@ const playAgainButton = document.querySelector('.play-again');
  * Implement game functions
  */
 
-/*
- * Display the cards on the page
- *   - shuffle the list of cards using the provided "shuffle" method below
- *   - loop through each card and create its HTML
- *   - add each card's HTML to the page
- */
-function displayNewGameCards() {
-    shuffle(cards);
-
+// Add each card's HTML to the page
+function displayGameCards() {
     let deckHtml = '';
 
     for (const card of cards) {
@@ -53,7 +53,7 @@ function displayNewGameCards() {
             </li>
         `;
     }
-
+    // Create new card-elements
     deck.innerHTML = deckHtml;
 }
 
@@ -70,18 +70,20 @@ function shuffle(array) {
     }
 }
 
-// Reset counters, score panel, timer etc
+// Set initial values - start timer
 function setupNewGame() {
-    matchedCards = 0;
     moveCounter = 0;
-    openCards = [];
+    movesPanel.innerText = 0;
 
     starCounter = 3;
+    // display 2nd and 3rd stars
     secondStar.classList.replace('fa-star-o', 'fa-star');
     thirdStar.classList.replace('fa-star-o', 'fa-star');
 
-    movesPanel.innerText = 0;
+    openCards = [];
+    matchedCards = 0;
 
+    // Start the timer
     gameStartTimeMsec = Date.now();
     gameTimer = setInterval(updateTimer, 200);
 }
@@ -101,6 +103,7 @@ function addToOpenCards(clickedCard) {
         // Add pulse animation to the first card
         clickedCard.classList.add('animated', 'pulse');
 
+        // Remove card animation after 0.30 sec
         setTimeout(function() {
             clickedCard.classList.remove('pulse');
         }, 300);
@@ -112,11 +115,15 @@ function updateMoveCounter() {
     movesPanel.innerText = ++moveCounter;
 }
 
+// Hide stars according to moveCounter value
 function updateStars() {
+    // Hide 3rd star after 8th move
     if (moveCounter === 9) {
         thirdStar.classList.replace('fa-star', 'fa-star-o');
         starCounter = 2;
     }
+
+    // Hide 2nd star after 14th move
     if (moveCounter === 15) {
         secondStar.classList.replace('fa-star', 'fa-star-o');
         starCounter = 1;
@@ -132,6 +139,7 @@ function addToMachedCards() {
         // Add rubberBand animation to the matched cards
         card.classList.add('match', 'animated', 'rubberBand');
 
+        // Remove card animation after 0.50 sec
         setTimeout(function() {
             card.classList.remove('rubberBand');
         }, 500);
@@ -145,14 +153,11 @@ function addToMachedCards() {
 
 // Display a message with the final score
 function displayFinalScore() {
-    // Stop the timer
-    clearInterval(gameTimer);
-
     // Display win panel
     gamePanel.style.display = 'none';
     winPanel.style.display = 'flex';
 
-    gameTimeSpan.innerText =  msecToTimeString(msecElapsed);
+    gameTimeSpan.innerText =  msecToTimeString(msecOfGameTime);
     gameStarsSpan.innerText = starCounter === 1 ? starCounter + ' Star.' : starCounter + ' Stars.';
 }
 
@@ -164,6 +169,7 @@ function hideOpenCards() {
         // Add wobble animation to the selected cards
         card.classList.add('animated', 'wobble');
 
+        // Remove card animation after 0.50 sec
         setTimeout(function() {
             card.classList.remove('wobble', 'open', 'show');
             card.style.backgroundColor = '#2e3d49';
@@ -177,9 +183,9 @@ function hideOpenCards() {
 // Update game's timer
 function updateTimer() {
     const msecNow = Date.now();
-    msecElapsed = msecNow - gameStartTimeMsec;
+    msecOfGameTime = msecNow - gameStartTimeMsec;
 
-    const timeElapsed = msecToTimeString(msecElapsed);
+    const timeElapsed = msecToTimeString(msecOfGameTime);
     timerArea.innerText = timeElapsed;
 }
 
@@ -200,38 +206,125 @@ function msecToTimeString(timeInMsecs) {
     return timeString;
 }
 
+// Start new game
 function startNewGame() {
-    displayNewGameCards();
+    // shuffle the list of card-symbols
+    shuffle(cards);
+    displayGameCards();
     setupNewGame();
 }
 
+// Store the classes of all cards in the cardClasses list
+function getCardClasses() {
+    // Select the current card-elements
+    const cardElements = document.querySelectorAll('.deck .card');
+    cardClasses = [];
+    for (let index = 0; index < cardElements.length; index++) {
+        cardClasses.push(cardElements[index].className);
+    }
+}
+
+// Restore the classes of all cards from the cardClasses list
+function restoreCardClasses() {
+    // Select the new card-elements created from the displayGameCards function
+    const cardElements = document.querySelectorAll('.deck .card');
+    for (let index = 0; index < cardElements.length; index++) {
+        cardElements[index].className = cardClasses[index];
+
+        // If a card was open add it to the list-of-opened-cards
+        if (cardElements[index].classList.contains('open')) {
+            openCards.push(cardElements[index]);
+        }
+    }
+}
+
+// Save the current game
+function saveGame() {
+    // Save game-status variable-values
+    localStorage.setItem('moveCounter', moveCounter);
+    localStorage.setItem('starCounter', starCounter);
+    localStorage.setItem('matchedCards', matchedCards);
+    localStorage.setItem('msecOfGameTime', msecOfGameTime);
+
+    // Save cards-symbols
+    localStorage.setItem('cards', JSON.stringify(cards));
+
+    // Save cards-status
+    getCardClasses();
+    localStorage.setItem('cardClasses', JSON.stringify(cardClasses));
+
+    // Display successful-save message
+    messageArea.style.display = 'inline-block';
+    message.innerText = 'Game saved!';
+
+    // Hide successful-save message after 2 seconds
+    setTimeout(function() {
+        messageArea.style.display = 'none';
+    }, 2000);
+
+    // Display load button after first save
+    loadButton.style.display = 'inline-block';
+}
+
+// Load the saved game
+function loadGame() {
+    // Restore game-status variable-values
+    moveCounter = parseInt(localStorage.getItem('moveCounter'));
+    starCounter = parseInt(localStorage.getItem('starCounter'));
+    matchedCards = parseInt(localStorage.getItem('matchedCards'));
+    msecOfGameTime = parseInt(localStorage.getItem('msecOfGameTime'));
+
+    // Restore cards-symbols
+    cards = JSON.parse(localStorage.getItem('cards'));
+
+    // Update cards HTML with restored cards-symbols
+    displayGameCards();
+
+    // Restore cards-status
+    cardClasses = JSON.parse(localStorage.getItem('cardClasses'));
+    restoreCardClasses();
+
+    // Update moves panel with restored move-counter value
+    movesPanel.innerText = moveCounter;
+
+    // display 2nd and 3rd stars
+    secondStar.classList.replace('fa-star-o', 'fa-star');
+    thirdStar.classList.replace('fa-star-o', 'fa-star');
+    // Hide stars according to moveCounter value
+    updateStars();
+
+    // Update timer with the restored value of game-time
+    gameStartTimeMsec = Date.now() - msecOfGameTime;
+
+    // Display successful-load message
+    messageArea.style.display = 'inline-block';
+    message.innerText = 'Game loaded!';
+
+    // Hide successful-load message after 2 seconds
+    setTimeout(function() {
+        messageArea.style.display = 'none';
+    }, 2000);
+}
+
 /*
- * Start game
+ * Start game - add event listeners
  */
 
 startNewGame();
 
-/*
- * Add the event listener for the cards. If a card is clicked:
- *  - display the card's symbol
- *  - add the card to a *list* of "open" cards
- *  - if the list already has another card, check to see if the two cards match
- *    + if the cards do match, lock the cards in the open position
- *    + if the cards do not match, remove the cards from the list and hide the card's symbol
- *    + increment the move counter and display it on the page
- *    + if all cards have matched, display a message with the final score
- */
+// Add click listener for the cards
  deck.addEventListener('click', function(e) {
-    // If target is a card
+    // If clicked target is a card
     if (e.target.classList.contains('card')) {
         let clickedCard = e.target;
         // If the clicked card is not already matched
         if (clickedCard.classList.contains('match') === false) {
             // If the clicked card is not already open (is not clicked twice)
             if (openCards.includes(clickedCard) === false) {
+                // Open the card
                 displayCard(clickedCard);
                 addToOpenCards(clickedCard);
-                // And if there is another open card, then we have a move to handle
+                // If the list-of-opened-cards already has another card
                 if (openCards.length > 1) {
                     updateMoveCounter();
                     updateStars();
@@ -240,16 +333,20 @@ startNewGame();
                     firstCardSymbol = firstCard.children[0].className;
                     secondCard = openCards[1];
                     secondCardSymbol = secondCard.children[0].className;
-
-                    // Check the equality of symbols classes
+                    // If the cards do match
                     if (firstCardSymbol === secondCardSymbol) {
                         addToMachedCards();
+                        // If all cards have matched
                         if (matchedCards === 16) {
+                            // Stop the timer
+                            clearInterval(gameTimer);
+
                             setTimeout(function() {
                                 displayFinalScore();
                             }, 2000);
                         }
                     } else {
+                        // else the cards do not match
                         hideOpenCards();
                     }
                 }
@@ -270,4 +367,17 @@ playAgainButton.addEventListener('click', function(e) {
     // Display game panel
     gamePanel.style.display = 'flex';
     winPanel.style.display = 'none';
+
+    // Display load button
+    loadButton.style.display = 'inline-block';
+});
+
+// Add the event listener for save-game button
+saveButton.addEventListener('click', function(e) {
+    saveGame();
+});
+
+// Add the event listener for load-game button
+loadButton.addEventListener('click', function(e) {
+    loadGame();
 });

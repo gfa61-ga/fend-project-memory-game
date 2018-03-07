@@ -128,12 +128,14 @@ h1 {
 .timer {
     padding-bottom: 35px;
 }
+
 .timer .time-string {
     padding-left: 5px;
 }
 
 .message-area {
     display: none;
+    color: #55a2c1;
 }
 
 .message-area .message {
@@ -145,7 +147,9 @@ h1 {
     display: inline-block;
     padding: 0 17px 0;
     cursor: pointer;
-    /* TODO */
+}
+
+.bottom-panel .storage-buttons .load {
     display: none;
 }
 
