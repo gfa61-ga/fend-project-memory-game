@@ -45,6 +45,29 @@ const top5Table = document.querySelector('.top-5-games tbody');
  * Implement game functions
  */
 
+// Restore scoreTable from localStorage
+function restoreScoreTable() {
+    if (storageAvailable()) {
+        // If localStorage is not empty
+        if(localStorage.getItem('scoreTable') != null) {
+            scoreTable = JSON.parse(localStorage.getItem('scoreTable'));
+        }
+    }
+}
+
+// Shuffle function from http://stackoverflow.com/a/2450976
+function shuffle(array) {
+    let currentIndex = array.length, temporaryValue, randomIndex;
+
+    while (currentIndex !== 0) {
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex -= 1;
+        temporaryValue = array[currentIndex];
+        array[currentIndex] = array[randomIndex];
+        array[randomIndex] = temporaryValue;
+    }
+}
+
 // Add each card's HTML to the page
 function displayGameCards() {
     let deckHtml = '';
@@ -60,17 +83,30 @@ function displayGameCards() {
     deck.innerHTML = deckHtml;
 }
 
-// Shuffle function from http://stackoverflow.com/a/2450976
-function shuffle(array) {
-    let currentIndex = array.length, temporaryValue, randomIndex;
+// Convert milliseconds to timeString
+function msecToTimeString(timeInMsecs) {
+    const timeConverter = new Date();
+    timeConverter.setTime(timeInMsecs);
 
-    while (currentIndex !== 0) {
-        randomIndex = Math.floor(Math.random() * currentIndex);
-        currentIndex -= 1;
-        temporaryValue = array[currentIndex];
-        array[currentIndex] = array[randomIndex];
-        array[randomIndex] = temporaryValue;
-    }
+    // use 24-hour time, in order to start time count from 00:00:00
+    const options = {
+        timeZone: 'UTC',
+        minute: '2-digit',
+        second:'2-digit',
+        hour12: false
+    };
+
+    const timeString = timeConverter.toLocaleTimeString('en-US', options);
+    return timeString;
+}
+
+// Update game's timer
+function updateTimer() {
+    const msecNow = Date.now();
+    msecOfGameTime = msecNow - gameStartTimeMsec;
+
+    const timeElapsed = msecToTimeString(msecOfGameTime);
+    timerArea.innerText = timeElapsed;
 }
 
 // Set initial values - start timer
@@ -100,6 +136,14 @@ function setupNewGame() {
             loadButton.style.display = 'inline-block';
         }
     }
+}
+
+// Start new game
+function startNewGame() {
+    // shuffle the list of card-symbols
+    shuffle(cards);
+    displayGameCards();
+    setupNewGame();
 }
 
 // Display the card's symbol
@@ -144,6 +188,25 @@ function updateStars() {
     }
 }
 
+// Remove the cards from the list and hide the card's symbol
+function hideOpenCards() {
+    for (const card of openCards) {
+        card.style.backgroundColor = '#f95b3c';
+
+        // Add wobble animation to the selected cards
+        card.classList.add('animated', 'wobble');
+
+        // Remove card animation after 0.50 sec
+        setTimeout(function() {
+            card.classList.remove('wobble', 'open', 'show');
+            card.style.backgroundColor = '#2e3d49';
+        }, 500);
+    }
+
+    // Empty openCards
+    openCards = [];
+}
+
 // Lock the cards in the open position
 function addToMachedCards() {
     for (const card of openCards) {
@@ -175,80 +238,67 @@ function displayFinalScore() {
     gameStarsSpan.innerText = starCounter === 1 ? starCounter + ' Star.' : starCounter + ' Stars.';
 }
 
-// Remove the cards from the list and hide the card's symbol
-function hideOpenCards() {
-    for (const card of openCards) {
-        card.style.backgroundColor = '#f95b3c';
+// Update score-table with current score
+function updateScoreTable() {
+    // Add current score to the table
+    scoreTable.push( {
+            'date': Date.now(),
+            'gameTime': msecOfGameTime,
+            'stars': starCounter
+        }
+    );
 
-        // Add wobble animation to the selected cards
-        card.classList.add('animated', 'wobble');
+    // Sort table by star descending and by gametime ascending
+    scoreTable.sort(function (a, b) {
+        return b.stars - a.stars || a.gameTime - b.gameTime;
+    });
 
-        // Remove card animation after 0.50 sec
-        setTimeout(function() {
-            card.classList.remove('wobble', 'open', 'show');
-            card.style.backgroundColor = '#2e3d49';
-        }, 500);
+    // Keep only first top scores
+    if (scoreTable.length > 5) {
+        scoreTable.pop();
     }
 
-    // Empty openCards
-    openCards = [];
+    // Save table to localStorage
+    if (storageAvailable()) {
+        localStorage.setItem('scoreTable', JSON.stringify(scoreTable));
+    }
 }
 
-// Update game's timer
-function updateTimer() {
-    const msecNow = Date.now();
-    msecOfGameTime = msecNow - gameStartTimeMsec;
-
-    const timeElapsed = msecToTimeString(msecOfGameTime);
-    timerArea.innerText = timeElapsed;
-}
-
-// Convert milliseconds to timeString
-function msecToTimeString(timeInMsecs) {
-    const timeConverter = new Date();
-    timeConverter.setTime(timeInMsecs);
+// Convert milliseconds to dateString
+function msecToDateString(timeInMsecs) {
+    const dateConverter = new Date();
+    dateConverter.setTime(timeInMsecs);
 
     // use 24-hour time, in order to start time count from 00:00:00
     const options = {
-        timeZone: 'UTC',
+        year: '2-digit',
+        month:'2-digit',
+        day: '2-digit',
+        hour:'2-digit',
+        hour12: false,
         minute: '2-digit',
-        second:'2-digit',
-        hour12: false
     };
 
-    const timeString = timeConverter.toLocaleTimeString('en-US', options);
-    return timeString;
+    const dateString = dateConverter.toLocaleDateString('el-GR', options);
+    return dateString;
 }
 
-// Start new game
-function startNewGame() {
-    // shuffle the list of card-symbols
-    shuffle(cards);
-    displayGameCards();
-    setupNewGame();
-}
+// Add scoreTable HTML to the page
+function displayScoreTable() {
+    // Erase previous scoreTable
+    top5Table.innerHTML = '';
 
-// Store the classes of all cards in the cardClasses list
-function getCardClasses() {
-    // Select the current card-elements
-    const cardElements = document.querySelectorAll('.deck .card');
-    cardClasses = [];
-    for (let index = 0; index < cardElements.length; index++) {
-        cardClasses.push(cardElements[index].className);
-    }
-}
+    for (let row = 0; row < scoreTable.length; row++) {
+        const newRow = top5Table.insertRow(row);
 
-// Restore the classes of all cards from the cardClasses list
-function restoreCardClasses() {
-    // Select the new card-elements created from the displayGameCards function
-    const cardElements = document.querySelectorAll('.deck .card');
-    for (let index = 0; index < cardElements.length; index++) {
-        cardElements[index].className = cardClasses[index];
+        let newColumn = newRow.insertCell(0);
+        newColumn.innerHTML = msecToDateString(scoreTable[row]['date']);
 
-        // If a card was open add it to the list-of-opened-cards
-        if (cardElements[index].classList.contains('open')) {
-            openCards.push(cardElements[index]);
-        }
+        newColumn = newRow.insertCell(1);
+        newColumn.innerHTML = msecToTimeString(scoreTable[row]['gameTime']);
+
+        newColumn = newRow.insertCell(2);
+        newColumn.innerHTML = scoreTable[row]['stars'];
     }
 }
 
@@ -260,6 +310,16 @@ function storageAvailable() {
         return true;
     } catch(e) {
         return false;
+    }
+}
+
+// Store the classes of all cards in the cardClasses list
+function getCardClasses() {
+    // Select the current card-elements
+    const cardElements = document.querySelectorAll('.deck .card');
+    cardClasses = [];
+    for (let index = 0; index < cardElements.length; index++) {
+        cardClasses.push(cardElements[index].className);
     }
 }
 
@@ -289,6 +349,20 @@ function saveGame() {
 
     // Display load button after first save
     loadButton.style.display = 'inline-block';
+}
+
+// Restore the classes of all cards from the cardClasses list
+function restoreCardClasses() {
+    // Select the new card-elements created from the displayGameCards function
+    const cardElements = document.querySelectorAll('.deck .card');
+    for (let index = 0; index < cardElements.length; index++) {
+        cardElements[index].className = cardClasses[index];
+
+        // If a card was open add it to the list-of-opened-cards
+        if (cardElements[index].classList.contains('open')) {
+            openCards.push(cardElements[index]);
+        }
+    }
 }
 
 // Load the saved game from localStorage
@@ -329,80 +403,6 @@ function loadGame() {
     setTimeout(function() {
         messageArea.style.display = 'none';
     }, 2000);
-}
-
-// Update score-table with current score
-function updateScoreTable() {
-    // Add current score to the table
-    scoreTable.push( {
-            'date': Date.now(),
-            'gameTime': msecOfGameTime,
-            'stars': starCounter
-        }
-    );
-
-    // Sort table by star descending and by gametime ascending
-    scoreTable.sort(function (a, b) {
-        return b.stars - a.stars || a.gameTime - b.gameTime;
-    });
-
-    // Keep only first top scores
-    if (scoreTable.length > 5) {
-        scoreTable.pop();
-    }
-
-    // Save table to localStorage
-    if (storageAvailable()) {
-        localStorage.setItem('scoreTable', JSON.stringify(scoreTable));
-    }
-}
-
-// Add scoreTable HTML to the page
-function displayScoreTable() {
-    // Erase previous scoreTable
-    top5Table.innerHTML = '';
-
-    for (let row = 0; row < scoreTable.length; row++) {
-        const newRow = top5Table.insertRow(row);
-
-        let newColumn = newRow.insertCell(0);
-        newColumn.innerHTML = msecToDateString(scoreTable[row]['date']);
-
-        newColumn = newRow.insertCell(1);
-        newColumn.innerHTML = msecToTimeString(scoreTable[row]['gameTime']);
-
-        newColumn = newRow.insertCell(2);
-        newColumn.innerHTML = scoreTable[row]['stars'];
-    }
-}
-
-// Convert milliseconds to dateString
-function msecToDateString(timeInMsecs) {
-    const dateConverter = new Date();
-    dateConverter.setTime(timeInMsecs);
-
-    // use 24-hour time, in order to start time count from 00:00:00
-    const options = {
-        year: '2-digit',
-        month:'2-digit',
-        day: '2-digit',
-        hour:'2-digit',
-        hour12: false,
-        minute: '2-digit',
-    };
-
-    const dateString = dateConverter.toLocaleDateString('el-GR', options);
-    return dateString;
-}
-
-// Restore scoreTable from localStorage
-function restoreScoreTable() {
-    if (storageAvailable()) {
-        // If localStorage is not empty
-        if(localStorage.getItem('scoreTable') != null) {
-            scoreTable = JSON.parse(localStorage.getItem('scoreTable'));
-        }
-    }
 }
 
 /*
