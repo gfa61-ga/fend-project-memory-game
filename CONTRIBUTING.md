@@ -1,3 +1,13 @@
 # How to contribute
 
-The files in this repository are used as the starting point for all students. Because we want students to write the majority of the code themselves, pull requests (most likely) will _not_ be merged into the project.
+Your contribution is welcome..!!
+
+To create a pull request, please:
+
+* fork the source repository,
+* clone your fork down to your machine,
+* make some commits (ideally on a topic branch!),
+* push the commits back to your fork and
+* create a new pull request and choose the branch that has your new commits.
+
+It's will be helpful if you include a demo of submitted changes in a pen.
