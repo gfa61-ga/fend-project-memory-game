@@ -198,6 +198,10 @@ h1 {
     cursor: pointer;
 }
 
+/*
+ * Styles for the leaderboard
+ */
+
 .leaderboard {
     width: 660px;
     padding: 32px;
