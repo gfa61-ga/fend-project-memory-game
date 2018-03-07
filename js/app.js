@@ -15,6 +15,7 @@ let cards = ['diamond', 'diamond',
 // Declare global variables
 let matchedCards, moveCounter, starCounter, openCards;
 let gameStartTimeMsec, gameTimer, msecOfGameTime, cardClasses;
+let scoreTable = [];
 
 // Set element selectors
 const gamePanel = document.querySelector('.game-panel');
@@ -37,6 +38,8 @@ const winPanel = document.querySelector('.win-panel');
 const gameTimeSpan = document.querySelector('.game-time');
 const gameStarsSpan = document.querySelector('.star-number');
 const playAgainButton = document.querySelector('.play-again');
+
+const top5Table = document.querySelector('.top-5-games tbody');
 
 /*
  * Implement game functions
@@ -87,14 +90,15 @@ function setupNewGame() {
     gameStartTimeMsec = Date.now();
     gameTimer = setInterval(updateTimer, 200);
 
-    // If localStorage is available display save button
-    if (storageAvailable('localStorage')) {
+    // If localStorage is available
+    if (storageAvailable()) {
+        // Display save button
         saveButton.style.display = 'inline-block';
-    }
 
-    // If there is game-data in localStorage display load button
-    if (localStorage.getItem('moveCounter') != null) {
-        loadButton.style.display = 'inline-block';
+        // If there is game-data in localStorage display load button
+        if (localStorage.getItem('moveCounter') != null) {
+            loadButton.style.display = 'inline-block';
+        }
     }
 }
 
@@ -248,13 +252,15 @@ function restoreCardClasses() {
     }
 }
 
-// Return true if localStorage is both supported and available
-function storageAvailable(type) {
-    var storage = window[type],
-        x = '__storage_test__';
-    storage.setItem(x, x);
-    storage.removeItem(x);
-    return true;
+// Return true if localStorage is available
+function storageAvailable() {
+    try {
+        localStorage.setItem('test', '__storage_test__');
+        localStorage.removeItem('test');
+        return true;
+    } catch(e) {
+        return false;
+    }
 }
 
 // Save the current game in localStorage
@@ -325,14 +331,89 @@ function loadGame() {
     }, 2000);
 }
 
+// Update score-table with current score
+function updateScoreTable() {
+    // Add current score to the table
+    scoreTable.push( {
+            'date': Date.now(),
+            'gameTime': msecOfGameTime,
+            'stars': starCounter
+        }
+    );
+
+    // Sort table by star descending and by gametime ascending
+    scoreTable.sort(function (a, b) {
+        return b.stars - a.stars || a.gameTime - b.gameTime;
+    });
+
+    // Keep only first top scores
+    if (scoreTable.length > 5) {
+        scoreTable.pop();
+    }
+
+    // Save table to localStorage
+    if (storageAvailable()) {
+        localStorage.setItem('scoreTable', JSON.stringify(scoreTable));
+    }
+}
+
+// Add scoreTable HTML to the page
+function displayScoreTable() {
+    // Erase previous scoreTable
+    top5Table.innerHTML = '';
+
+    for (let row = 0; row < scoreTable.length; row++) {
+        const newRow = top5Table.insertRow(row);
+
+        let newColumn = newRow.insertCell(0);
+        newColumn.innerHTML = msecToDateString(scoreTable[row]['date']);
+
+        newColumn = newRow.insertCell(1);
+        newColumn.innerHTML = msecToTimeString(scoreTable[row]['gameTime']);
+
+        newColumn = newRow.insertCell(2);
+        newColumn.innerHTML = scoreTable[row]['stars'];
+    }
+}
+
+// Convert milliseconds to dateString
+function msecToDateString(timeInMsecs) {
+    const dateConverter = new Date();
+    dateConverter.setTime(timeInMsecs);
+
+    // use 24-hour time, in order to start time count from 00:00:00
+    const options = {
+        year: '2-digit',
+        month:'2-digit',
+        day: '2-digit',
+        hour:'2-digit',
+        hour12: false,
+        minute: '2-digit',
+    };
+
+    const dateString = dateConverter.toLocaleDateString('el-GR', options);
+    return dateString;
+}
+
+// Restore scoreTable from localStorage
+function restoreScoreTable() {
+    if (storageAvailable()) {
+        // If localStorage is not empty
+        if(localStorage.getItem('scoreTable') != null) {
+            scoreTable = JSON.parse(localStorage.getItem('scoreTable'));
+        }
+    }
+}
+
 /*
  * Start game - add event listeners
  */
 
+restoreScoreTable();
 startNewGame();
 
 // Add click listener for the cards
- deck.addEventListener('click', function(e) {
+deck.addEventListener('click', function(e) {
     // If clicked target is a card
     if (e.target.classList.contains('card')) {
         let clickedCard = e.target;
@@ -359,9 +440,11 @@ startNewGame();
                         if (matchedCards === 16) {
                             // Stop the timer
                             clearInterval(gameTimer);
-
+                            // Display final score after 2 seconds
                             setTimeout(function() {
                                 displayFinalScore();
+                                updateScoreTable();
+                                displayScoreTable();
                             }, 2000);
                         }
                     } else {
@@ -387,8 +470,8 @@ playAgainButton.addEventListener('click', function(e) {
     gamePanel.style.display = 'flex';
     winPanel.style.display = 'none';
 
-    // Display load button
-    if (storageAvailable('localStorage')) {
+    // If localStorage is available display load button
+    if (storageAvailable()) {
         loadButton.style.display = 'inline-block';
     }
 });
