@@ -199,8 +199,53 @@ h1 {
 }
 
 .leaderboard {
-    display: none;
-    /* TODO */
+    width: 660px;
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
+.leaderboard h3 {
+    text-decoration: underline;
+}
 
+.leaderboard th {
+    background-color: #36a9b6;
+    color: white;
+}
+
+.leaderboard tbody {
+    font-family: "Lucida Console", monospace;
+    font-size: 14px;
+}
+
+.leaderboard tr {
+    height: 28px;
+}
+
+.leaderboard th, td {
+    min-width: 140px;
+    text-align: center;
+}
+
+.leaderboard tr:nth-child(1) {
+  background-color: #51a4bf;
+}
+
+.leaderboard tr:nth-child(2) {
+  background-color: #5898b8;
+}
+
+.leaderboard tr:nth-child(3) {
+  background-color: #6798c1;
+}
+
+.leaderboard tr:nth-child(4) {
+  background-color: #708dbb;
+}
+
+.leaderboard tr:nth-child(5) {
+  background-color: #7e8cc4;
+}
