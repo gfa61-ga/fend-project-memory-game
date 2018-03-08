@@ -15,6 +15,7 @@ let cards = ['diamond', 'diamond',
 // Declare global variables
 let matchedCards, moveCounter, starCounter, openCards;
 let gameStartTimeMsec, gameTimer, msecOfGameTime, cardClasses;
+let detectFirstMove, detectIfGameIsLoaded;
 let scoreTable = [];
 
 // Set element selectors
@@ -122,9 +123,10 @@ function setupNewGame() {
     openCards = [];
     matchedCards = 0;
 
-    // Start the timer
-    gameStartTimeMsec = Date.now();
-    gameTimer = setInterval(updateTimer, 200);
+    timerArea.innerText = '00:00';
+    // Setup variables needed for the timer start
+    detectFirstMove = false;
+    detectIfGameIsLoaded = false;
 
     // If localStorage is available
     if (storageAvailable()) {
@@ -148,6 +150,20 @@ function startNewGame() {
 
 // Display the card's symbol
 function displayCard(clickedCard) {
+    // If this is the first move
+    if (detectFirstMove === false) {
+        detectFirstMove = true;
+
+        // Start the timer
+        if (detectIfGameIsLoaded === true) {
+            // Update timer with the restored value of game-time
+            gameStartTimeMsec = Date.now() - msecOfGameTime;
+        } else {
+            gameStartTimeMsec = Date.now();
+        }
+        gameTimer = setInterval(updateTimer, 200);
+    }
+
     clickedCard.classList.add('open', 'show');
 }
 
@@ -175,14 +191,14 @@ function updateMoveCounter() {
 
 // Hide stars according to moveCounter value
 function updateStars() {
-    // Hide 3rd star after 8th move
-    if (moveCounter >= 9) {
+    // Hide 3rd star after 14th move
+    if (moveCounter > 14) {
         thirdStar.classList.replace('fa-star', 'fa-star-o');
         starCounter = 2;
     }
 
-    // Hide 2nd star after 14th move
-    if (moveCounter >= 15) {
+    // Hide 2nd star after 17th move
+    if (moveCounter > 17) {
         secondStar.classList.replace('fa-star', 'fa-star-o');
         starCounter = 1;
     }
@@ -269,7 +285,6 @@ function msecToDateString(timeInMsecs) {
     const dateConverter = new Date();
     dateConverter.setTime(timeInMsecs);
 
-    // use 24-hour time, in order to start time count from 00:00:00
     const options = {
         year: '2-digit',
         month:'2-digit',
@@ -325,6 +340,10 @@ function getCardClasses() {
 
 // Save the current game in localStorage
 function saveGame() {
+    // Stop the timer
+    clearInterval(gameTimer);
+    timerArea.innerText = '00:00';
+
     // Save game-status variable-values
     localStorage.setItem('moveCounter', moveCounter);
     localStorage.setItem('starCounter', starCounter);
@@ -341,6 +360,8 @@ function saveGame() {
     // Display successful-save message
     messageArea.style.display = 'inline-block';
     message.innerText = 'Game saved!';
+
+    startNewGame();
 
     // Hide successful-save message after 2 seconds
     setTimeout(function() {
@@ -392,8 +413,11 @@ function loadGame() {
     // Hide stars according to moveCounter value
     updateStars();
 
-    // Update timer with the restored value of game-time
-    gameStartTimeMsec = Date.now() - msecOfGameTime;
+    const timeElapsed = msecToTimeString(msecOfGameTime);
+    timerArea.innerText = timeElapsed;
+    // Setup variables needed for the timer start
+    detectFirstMove = false;
+    detectIfGameIsLoaded = true;
 
     // Display successful-load message
     messageArea.style.display = 'inline-block';
@@ -459,6 +483,9 @@ deck.addEventListener('click', function(e) {
 
 // Add the event listener for restart button
 restartButton.addEventListener('click', function(e) {
+    // Stop the timer
+    clearInterval(gameTimer);
+
     startNewGame();
 });
 

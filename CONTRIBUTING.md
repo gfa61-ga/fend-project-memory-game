@@ -1,6 +1,6 @@
 # How to contribute
 
-Your contribution is welcome..!!
+Your ideas for game improvements and your contribution  are welcome..!!
 
 To create a pull request, please:
 
@@ -10,4 +10,4 @@ To create a pull request, please:
 * push the commits back to your fork and
 * create a new pull request and choose the branch that has your new commits.
 
-It's will be helpful if you include a demo of submitted changes in a pen.
+It's will be helpful if you include a demo of submitted improvements in a pen.
