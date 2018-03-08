@@ -128,6 +128,8 @@ function setupNewGame() {
     detectFirstMove = false;
     detectIfGameIsLoaded = false;
 
+    messageArea.style.display = 'none';
+
     // If localStorage is available
     if (storageAvailable()) {
         // Display save button
@@ -361,11 +363,10 @@ function saveGame() {
     messageArea.style.display = 'inline-block';
     message.innerText = 'Game saved!';
 
-    startNewGame();
-
-    // Hide successful-save message after 2 seconds
+    // Hide successful-save message and start new game, after 2 seconds
     setTimeout(function() {
         messageArea.style.display = 'none';
+        startNewGame();
     }, 2000);
 
     // Display load button after first save
@@ -505,7 +506,10 @@ playAgainButton.addEventListener('click', function(e) {
 
 // Add the event listener for save-game button
 saveButton.addEventListener('click', function(e) {
-    saveGame();
+    // If the game has started
+    if (detectFirstMove === true) {
+        saveGame();
+    }
 });
 
 // Add the event listener for load-game button

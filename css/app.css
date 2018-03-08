@@ -34,6 +34,10 @@ h1 {
     font-weight: 300;
 }
 
+.game-panel h1 {
+    margin-bottom: 10px;
+}
+
 /*
  * Styles for the deck of cards
  */
@@ -90,13 +94,12 @@ h1 {
     text-align: left;
     font-size: 18px;
     width: 375px;
-    margin-bottom: 10px;
     padding-left: 15px;
 }
 
 .score-panel .stars {
     margin: 0;
-    padding: 0;
+    padding: 11px 0;
     display: inline-block;
     margin: 0 5px 0 0;
 }
@@ -109,7 +112,7 @@ h1 {
 .score-panel .restart {
     float: right;
     cursor: pointer;
-    padding: 0 17px 0;
+    padding: 11px 16px;
 }
 
 /*
@@ -122,11 +125,10 @@ h1 {
     display: inline-flex;
     justify-content: space-between;
     padding-left: 25px;
-    margin-top: 10px;
 }
 
 .timer {
-    padding-bottom: 35px;
+    padding: 11px 0 35px;
 }
 
 .timer .time-string {
@@ -134,8 +136,8 @@ h1 {
 }
 
 .message-area {
-    display: none;
-    color: #55a2c1;
+    color: #09c9bb;
+    padding-top: 6px;
 }
 
 .message-area .message {
@@ -145,7 +147,7 @@ h1 {
 .bottom-panel .storage-buttons .save,
 .load {
     display: inline-block;
-    padding: 0 17px 0;
+    padding: 11px 16px;
     cursor: pointer;
     display: none;
 }
