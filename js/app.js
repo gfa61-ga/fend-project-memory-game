@@ -363,11 +363,11 @@ function saveGame() {
     messageArea.style.display = 'inline-block';
     message.innerText = 'Game saved!';
 
-    // Hide successful-save message and start new game, after 2 seconds
+    // Hide successful-save message and start new game, after 4 seconds
     setTimeout(function() {
         messageArea.style.display = 'none';
         startNewGame();
-    }, 2000);
+    }, 4000);
 
     // Display load button after first save
     loadButton.style.display = 'inline-block';
@@ -389,7 +389,7 @@ function restoreCardClasses() {
 
 // Load the saved game from localStorage
 function loadGame() {
-    // Restore game-status variable-values
+     // Restore game-status variable-values
     moveCounter = parseInt(localStorage.getItem('moveCounter'));
     starCounter = parseInt(localStorage.getItem('starCounter'));
     matchedCards = parseInt(localStorage.getItem('matchedCards'));
@@ -415,6 +415,8 @@ function loadGame() {
     updateStars();
 
     const timeElapsed = msecToTimeString(msecOfGameTime);
+    // Update and stop the timer
+    clearInterval(gameTimer);
     timerArea.innerText = timeElapsed;
     // Setup variables needed for the timer start
     detectFirstMove = false;
@@ -424,10 +426,10 @@ function loadGame() {
     messageArea.style.display = 'inline-block';
     message.innerText = 'Game loaded!';
 
-    // Hide successful-load message after 2 seconds
+    // Hide successful-load message after 4 seconds
     setTimeout(function() {
         messageArea.style.display = 'none';
-    }, 2000);
+    }, 4000);
 }
 
 /*

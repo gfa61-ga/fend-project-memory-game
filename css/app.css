@@ -136,8 +136,9 @@ h1 {
 }
 
 .message-area {
-    color: #09c9bb;
-    padding-top: 6px;
+    color: red;
+    font-weight: bold;
+    padding-top: 11px;
 }
 
 .message-area .message {
