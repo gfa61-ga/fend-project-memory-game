@@ -499,11 +499,6 @@ playAgainButton.addEventListener('click', function(e) {
     // Display game panel
     gamePanel.style.display = 'flex';
     winPanel.style.display = 'none';
-
-    // If localStorage is available display load button
-    if (storageAvailable()) {
-        loadButton.style.display = 'inline-block';
-    }
 });
 
 // Add the event listener for save-game button
@@ -511,6 +506,10 @@ saveButton.addEventListener('click', function(e) {
     // If the game has started
     if (detectFirstMove === true) {
         saveGame();
+        // If localStorage is available display load button
+        if (storageAvailable()) {
+            loadButton.style.display = 'inline-block';
+        }
     }
 });
 
