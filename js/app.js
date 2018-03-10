@@ -38,6 +38,8 @@ const loadButton = document.querySelector('.load');
 const winPanel = document.querySelector('.win-panel');
 const gameTimeSpan = document.querySelector('.game-time');
 const gameStarsSpan = document.querySelector('.star-number');
+const memStatus = document.querySelector('.memStatus');
+
 const playAgainButton = document.querySelector('.play-again');
 
 const top5Table = document.querySelector('.top-5-games tbody');
@@ -193,14 +195,14 @@ function updateMoveCounter() {
 
 // Hide stars according to moveCounter value
 function updateStars() {
-    // Hide 3rd star after 14th move
-    if (moveCounter > 14) {
+    // Hide 3rd star after 15th move
+    if (moveCounter > 15) {
         thirdStar.classList.replace('fa-star', 'fa-star-o');
         starCounter = 2;
     }
 
-    // Hide 2nd star after 17th move
-    if (moveCounter > 17) {
+    // Hide 2nd star after 20th move
+    if (moveCounter > 20) {
         secondStar.classList.replace('fa-star', 'fa-star-o');
         starCounter = 1;
     }
@@ -254,6 +256,16 @@ function displayFinalScore() {
 
     gameTimeSpan.innerText =  msecToTimeString(msecOfGameTime);
     gameStarsSpan.innerText = starCounter === 1 ? starCounter + ' Star.' : starCounter + ' Stars.';
+    switch(starCounter) {
+        case 1:
+            memStatus.innerText = 'Your memory needs improvement.. :(';
+            break;
+        case 2:
+            memStatus.innerText = 'Your memory is in good shape.. :)';
+            break;
+        case 3:
+            memStatus.innerText = 'Your memory is impressively sharp..!!';
+    }
 }
 
 // Update score-table with current score
@@ -363,11 +375,11 @@ function saveGame() {
     messageArea.style.display = 'inline-block';
     message.innerText = 'Game saved!';
 
-    // Hide successful-save message and start new game, after 4 seconds
+    // Hide successful-save message and start new game, after 2 seconds
     setTimeout(function() {
         messageArea.style.display = 'none';
         startNewGame();
-    }, 4000);
+    }, 2000);
 
     // Display load button after first save
     loadButton.style.display = 'inline-block';
